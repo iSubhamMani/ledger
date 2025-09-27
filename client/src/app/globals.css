@@ -136,10 +136,26 @@
   }
 }
 
-.floating-element {
+.floating-element-1 {
   filter: drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.7));
   animation-name: float;
   animation-duration: 7s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.floating-element-2 {
+  filter: drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.7));
+  animation-name: float;
+  animation-duration: 9s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.floating-element-3 {
+  filter: drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.7));
+  animation-name: float;
+  animation-duration: 8s;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
 }

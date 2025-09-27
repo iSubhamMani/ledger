@@ -42,8 +42,8 @@ export default function Home() {
       <main className="z-10 relative h-screen bg-gradient-to-b from-orange-500 via-orange-100 to-white">
         <Particles size={0.8} quantity={20} color="#666666" />
         <div>
-          <RiMoneyRupeeCircleFill className="floating-element absolute top-10 md:top-20 -rotate-[30deg] left-10 md:left-20 size-16 md:size-20 text-black opacity-20" />
-          <RiMoneyRupeeCircleFill className="floating-element absolute top-20 md:top-40 rotate-[30deg] right-15 md:right-30 size-16 md:size-20 text-black opacity-20" />
+          <RiMoneyRupeeCircleFill className="floating-element-1 absolute top-10 md:top-20 -rotate-[30deg] left-10 md:left-20 size-16 md:size-20 text-black opacity-20" />
+          <RiMoneyRupeeCircleFill className="floating-element-2 absolute top-20 md:top-40 rotate-[30deg] right-15 md:right-30 size-16 md:size-20 text-black opacity-20" />
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-96">
           {/* Mobile curve - gentler */}
@@ -98,7 +98,7 @@ export default function Home() {
           </svg>
         </div>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 md:px-12 lg:px-24">
-          <MdCalculate className="floating-element rotate-[20deg] size-16 md:size-20 text-black opacity-20" />
+          <MdCalculate className="floating-element-3 rotate-[20deg] size-16 md:size-20 text-black opacity-20" />
           <h1 className="glowing-text text-5xl md:text-6xl lg:text-7xl font-extrabold text-[#333333] drop-shadow-lg">
             Ledger
           </h1>
