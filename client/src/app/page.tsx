@@ -6,9 +6,8 @@ import {
   TrendingUp,
   PieChart,
   Brain,
-  Smartphone,
-  Shield,
   SquareArrowOutUpRight,
+  ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -39,7 +38,7 @@ export default function Home() {
     <div className="relative w-full min-h-screen overflow-hidden">
       {/* Main gradient background */}
 
-      <main className="z-10 relative h-screen bg-gradient-to-b from-orange-500 via-orange-100 to-white">
+      <main className="z-10 relative h-screen bg-gradient-to-b from-orange-500 via-orange-200 to-white">
         <Particles size={0.8} quantity={20} color="#666666" />
         <div>
           <RiMoneyRupeeCircleFill className="floating-element-1 absolute top-10 md:top-20 -rotate-[30deg] left-10 md:left-20 size-16 md:size-20 text-black opacity-20" />
@@ -108,20 +107,24 @@ export default function Home() {
           <div className="flex gap-6 mt-6">
             <Button
               size={"lg"}
-              className="shadow-sm group py-6 font-medium flex items-center bg-orange-200 hover:bg-orange-300 text-black rounded-full cursor-pointer"
+              className="shadow-sm group py-6 font-medium flex items-center bg-orange-300 hover:bg-orange-400 text-black rounded-full cursor-pointer"
             >
               <span className="text-sm">Start Tracking</span>
               <RiMoneyRupeeCircleFill className="size-5 group-hover:scale-110 transition-transform duration-200" />
             </Button>
           </div>
+          <p className="flex gap-2 mt-10 md:mt-12 text-sm md:text-base text-[#474747] items-center">
+            <span>Learn More</span>
+            <ChevronDown className="size-5 animate-bounce text-[#666666]" />
+          </p>
         </div>
       </main>
 
       <section className="p-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Why Ledger?
+            <h2 className="text-4xl md:text-5xl font-bold text-[#333333] mb-4">
+              Why <span className="text-orange-400">Ledger?</span>
             </h2>
           </div>
 
@@ -132,17 +135,17 @@ export default function Home() {
               const getBackgroundColor = (color: string) => {
                 switch (color) {
                   case "ledger-green":
-                    return "bg-ledger-green";
+                    return "bg-green-200";
                   case "ledger-pink":
-                    return "bg-ledger-pink";
+                    return "bg-pink-200";
                   case "ledger-purple":
-                    return "bg-ledger-purple";
+                    return "bg-purple-200";
                   case "ledger-blue":
-                    return "bg-ledger-blue";
+                    return "bg-blue-200";
                   case "ledger-yellow":
-                    return "bg-ledger-yellow";
+                    return "bg-yellow-200";
                   default:
-                    return "bg-ledger-green";
+                    return "bg-green-200";
                 }
               };
 
@@ -156,14 +159,14 @@ export default function Home() {
                       feature.color
                     )} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}
                   >
-                    <IconComponent className="w-8 h-8 text-gray-700" />
+                    <IconComponent className="w-8 h-8 text-[#333333]" />
                   </div>
 
-                  <h3 className="text-xl font-semibold text-foreground mb-3">
+                  <h3 className="text-xl font-semibold text-[#333333] mb-3">
                     {feature.title}
                   </h3>
 
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p className="text-[#666666] leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
