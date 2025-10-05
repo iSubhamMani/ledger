@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Particles } from "@/components/ui/particles";
 import { RiMoneyRupeeCircleFill } from "react-icons/ri";
 import { MdCalculate } from "react-icons/md";
@@ -10,6 +9,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
+import LoginButton from "@/components/LoginButton";
 
 const features = [
   {
@@ -105,13 +105,7 @@ export default function Home() {
             Your personal finance companion, powered by AI.
           </p>
           <div className="flex gap-6 mt-6">
-            <Button
-              size={"lg"}
-              className="shadow-sm group py-6 font-medium flex items-center bg-orange-300 hover:bg-orange-400 text-black rounded-full cursor-pointer"
-            >
-              <span className="text-sm">Start Tracking</span>
-              <RiMoneyRupeeCircleFill className="size-5 group-hover:scale-110 transition-transform duration-200" />
-            </Button>
+            <LoginButton />
           </div>
           <p className="flex gap-2 mt-10 md:mt-12 text-sm md:text-base text-[#474747] items-center">
             <span>Learn More</span>
