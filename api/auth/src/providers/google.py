@@ -4,6 +4,7 @@ import jwt
 import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
+from models import db, User
 
 load_dotenv()
 
@@ -50,6 +51,24 @@ def callback():
     name = user_info.get("name")
     sub = user_info.get("sub")
     photo = user_info.get("picture")
+
+    # Find or create user in db
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        user = User(
+            email=email,
+            name=name,
+            photo=photo,
+        )
+        db.session.add(user)
+        db.session.commit()
+    else:
+        # Optionally update user info if it has changed
+        user.name = name or user.name
+        user.photo = photo or user.photo
+        db.session.commit()
 
     # Create JWT for your app
     payload = {
