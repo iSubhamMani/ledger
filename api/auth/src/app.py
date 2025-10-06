@@ -2,11 +2,19 @@ from flask import Flask, redirect, request, jsonify, make_response
 import os
 import jwt
 from dotenv import load_dotenv
+from models import db
+from flask_migrate import Migrate
 from flask_cors import CORS
 from providers.google import callback as googleCallback, redirectToGoogleLogin
 
 load_dotenv()
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db.init_app(app)
+migrate = Migrate(app, db)
 
 FRONTEND_URL = os.getenv("FRONTEND_URL")
 CORS(
