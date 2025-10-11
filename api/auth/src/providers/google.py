@@ -4,7 +4,8 @@ import jwt
 import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
-from models import db, User
+from shared_db.models import User
+from  shared_db import db
 
 load_dotenv()
 
@@ -13,7 +14,7 @@ GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 JWT_SECRET = os.getenv("JWT_SECRET")
 FRONTEND_URL = os.getenv("FRONTEND_URL")
 TOKEN_EXPIRY = 60*60*24*7  # 7 days
-REDIRECT_URI = "http://localhost:8000/auth/google/callback"
+REDIRECT_URI = "http://localhost/auth/google/callback"
 
 def redirectToGoogleLogin():
     google_auth_url = (
@@ -72,8 +73,7 @@ def callback():
 
     # Create JWT for your app
     payload = {
-        "sub": sub,
-        "email": email,
+        "id": user.id,
         "name": name,
         "photo": photo,
         "exp": datetime.now() + timedelta(days=7)
