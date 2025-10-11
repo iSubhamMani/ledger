@@ -17,6 +17,7 @@ import {
 } from "@/utils/categories";
 import { Calendar, Check, Delete } from "lucide-react";
 import { MdOutlineCurrencyRupee } from "react-icons/md";
+import axios from "axios";
 
 const AddPage = () => {
   const [type, setType] = useState<"expense" | "income">("expense");
@@ -47,10 +48,23 @@ const AddPage = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const value = Number.parseFloat(amount);
     if (!value || value <= 0) return;
     // add transaction logic here
+    const res = await axios.post(
+      `http://localhost/transaction/add_transaction`,
+      {
+        txn_mode: method,
+        category: category,
+        txn_type: type,
+        amount: value,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(res.data);
     // Reset form
     setAmount("0");
     setCategory(categories[0]);
