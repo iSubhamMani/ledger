@@ -18,14 +18,14 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
       <DropdownMenu>
         <DropdownMenuTrigger
           asChild
-          className="cursor-pointer absolute top-3 right-3 sm:top-5 sm:right-5 md:top-7 md:right-7"
+          className="z-50 cursor-pointer absolute top-3 right-3 sm:top-5 sm:right-5 md:top-7 md:right-7"
         >
           <Avatar>
             <AvatarImage src="https://github.com/shadcn.png" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent align="end">
           <DropdownMenuLabel className="text-xs sm:text-sm">
             Subham Mani
           </DropdownMenuLabel>
