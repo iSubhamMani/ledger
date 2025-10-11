@@ -6,7 +6,7 @@ import { RiMoneyRupeeCircleFill } from "react-icons/ri";
 
 const LoginButton = () => {
   function googleLogin() {
-    window.location.href = `http://localhost:8000/auth/google`;
+    window.location.href = `http://localhost/auth/google`;
   }
 
   return (
