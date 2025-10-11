@@ -81,7 +81,7 @@ def callback():
     jwt_token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
 
     # Set cookie (HttpOnly)
-    resp = make_response(redirect(f"{FRONTEND_URL}/dashboard"))
+    resp = make_response(redirect(f"{FRONTEND_URL}/add"))
     resp.set_cookie(
         "auth_token",
         jwt_token,
