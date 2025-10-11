@@ -18,10 +18,10 @@ export function Nav() {
       isActive: pathname === "/add",
     },
     {
-      href: "/dashboard",
-      label: "Dashboard",
+      href: "/analytics",
+      label: "Analytics",
       icon: FaChartPie,
-      isActive: pathname === "/dashboard",
+      isActive: pathname === "/analytics",
     },
   ];
 
