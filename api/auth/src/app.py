@@ -35,6 +35,23 @@ def logout():
     resp.set_cookie("auth_token", "", expires=0)
     return resp
 
+@app.route("/me")
+def me():
+    token = request.cookies.get("auth_token")
+    if not token:
+        return jsonify({"error": "Unauthorized"}), 401
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        return jsonify({
+            "id": payload["id"],
+            "name": payload["name"],
+            "photo": payload["photo"],
+        })
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Invalid token"}), 401
+
 
 if __name__ == "__main__":
     app.run(port=8000, debug=True)
