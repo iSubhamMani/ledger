@@ -2,38 +2,48 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
-const PROTECTED_ROUTES = ["/dashboard", "/add"];
+const PROTECTED_ROUTES = ["/analytics", "/add"];
 
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get("auth_token")?.value;
 
-  // if the route is not protected, allow it
-  if (!PROTECTED_ROUTES.some((path) => req.nextUrl.pathname.startsWith(path))) {
-    return NextResponse.next();
-  }
+  const isProtectedRoute = PROTECTED_ROUTES.some((path) =>
+    req.nextUrl.pathname.startsWith(path)
+  );
+  const isRootRoute = req.nextUrl.pathname === "/";
 
-  // if no token → redirect
-  if (!token) {
+  // If route is protected and no token, redirect to "/"
+  if (isProtectedRoute && !token) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  try {
-    // verify token
-    const { payload } = await jwtVerify(
-      token,
-      new TextEncoder().encode(process.env.JWT_SECRET!)
-    );
-    console.log("Payload:", payload);
-    // token valid → allow request
+  // If token exists, verify it
+  if (token) {
+    try {
+      await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET!));
+      // If valid token and user is on root route, redirect to "/add"
+      if (isRootRoute) {
+        return NextResponse.redirect(new URL("/add", req.url));
+      }
+      // Valid token, allow request
+      return NextResponse.next();
+    } catch {
+      // Invalid token, redirect to "/"
+      if (isProtectedRoute) {
+        return NextResponse.redirect(new URL("/", req.url));
+      }
+      // For non-protected routes, allow request
+      return NextResponse.next();
+    }
+  }
+
+  // For non-protected routes, allow request
+  if (!isProtectedRoute) {
     return NextResponse.next();
-  } catch {
-    // token invalid or expired
-    const res = NextResponse.redirect(new URL("/", req.url));
-    return res;
   }
 }
 
 // Optional: specify where to run middleware
 export const config = {
-  matcher: ["/dashboard", "/add"],
+  matcher: ["/", "/analytics", "/add"],
 };
