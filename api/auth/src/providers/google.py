@@ -50,7 +50,6 @@ def callback():
 
     email = user_info.get("email")
     name = user_info.get("name")
-    sub = user_info.get("sub")
     photo = user_info.get("picture")
 
     # Find or create user in db
