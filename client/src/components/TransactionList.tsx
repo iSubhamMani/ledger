@@ -6,7 +6,6 @@ import {
   Car,
   Smartphone,
 } from "lucide-react";
-import { Card } from "@/components/ui/card";
 
 export interface Transaction {
   id: string;
