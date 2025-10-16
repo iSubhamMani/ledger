@@ -15,54 +15,103 @@ import {
   paymentIcon,
   paymentMethods,
 } from "@/utils/categories";
-import { Calendar, Check, Delete } from "lucide-react";
+import { Check, Delete } from "lucide-react";
 import { MdOutlineCurrencyRupee } from "react-icons/md";
 import { callApi } from "@/utils/callApi";
+import DateInputLabel from "@/components/DatePicker";
+import { useQueryClient } from "@tanstack/react-query";
+
+interface TxnData {
+  type: string;
+  amount: string;
+  category: string;
+  method: string;
+  date: string;
+  comment?: string;
+}
 
 const AddPage = () => {
-  const [type, setType] = useState<"expense" | "income">("expense");
-  const [amount, setAmount] = useState<string>("0");
-  const [category, setCategory] = useState<string>(categories[0]);
-  const [method, setMethod] = useState<string>(paymentMethods[0]);
+  const [txnData, setTxnData] = useState<TxnData>({
+    type: "expense",
+    amount: "0",
+    category: categories[0],
+    method: paymentMethods[0],
+    date: new Date().toISOString().split("T")[0],
+    comment: "",
+  });
+
+  const queryClient = useQueryClient();
 
   const handleNumberClick = (num: string) => {
-    setAmount((prev) => {
-      if (prev === "0") return num;
-      // Limit to 2 decimal places
-      const parts = prev.split(".");
-      if (parts.length === 2 && parts[1].length >= 2) return prev;
-      return prev + num;
+    setTxnData((prev) => {
+      const prevAmount = prev.amount;
+      if (prevAmount === "0") {
+        return { ...prev, amount: num };
+      }
+      const parts = prevAmount.split(".");
+      if (parts.length === 2 && parts[1].length >= 2) {
+        return prev;
+      }
+      return { ...prev, amount: prevAmount + num };
     });
   };
 
   const handleDecimal = () => {
-    if (!amount.includes(".")) {
-      setAmount((prev) => prev + ".");
-    }
+    setTxnData((prev) => {
+      const prevAmount = prev.amount;
+      if (prevAmount.includes(".")) return prev;
+      return { ...prev, amount: prevAmount + "." };
+    });
   };
 
   const handleDelete = () => {
-    setAmount((prev) => {
-      if (prev.length === 1) return "0";
-      return prev.slice(0, -1);
+    setTxnData((prev) => {
+      const prevAmount = prev.amount;
+      if (prevAmount.length === 1) {
+        return { ...prev, amount: "0" };
+      }
+      return { ...prev, amount: prevAmount.slice(0, -1) };
     });
   };
 
+  const handleDateChange = (selectedDate: string) => {
+    setTxnData((prev) => ({
+      ...prev,
+      date: selectedDate,
+    }));
+  };
+
   const handleSubmit = async () => {
-    const value = Number.parseFloat(amount);
+    const value = Number.parseFloat(txnData.amount);
     if (!value || value <= 0) return;
 
-    await callApi.post("/transaction/add_transaction", {
-      txn_mode: method,
-      category: category,
-      txn_type: type,
-      amount: value,
-    });
+    try {
+      await callApi.post("/transaction/add", {
+        txn_mode: txnData.method,
+        category: txnData.category,
+        txn_type: txnData.type,
+        amount: value,
+        txn_date: txnData.date,
+        comment: txnData.comment || null,
+      });
 
-    // Reset form
-    setAmount("0");
-    setCategory(categories[0]);
-    setMethod(paymentMethods[0]);
+      // Reset form
+      setTxnData({
+        type: "expense",
+        amount: "0",
+        category: categories[0],
+        method: paymentMethods[0],
+        date: new Date().toISOString().split("T")[0],
+        comment: "",
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["recentTransactions"],
+        exact: true,
+      });
+    } catch (error) {
+      // TODO: show error toast
+    }
   };
 
   return (
@@ -98,7 +147,12 @@ const AddPage = () => {
             <div className="space-y-2 sm:space-y-3">
               {/* Category and Method Selectors */}
               <div className="flex gap-2">
-                <Select value={method} onValueChange={setMethod}>
+                <Select
+                  value={txnData.method}
+                  onValueChange={(value) =>
+                    setTxnData((prev) => ({ ...prev, method: value }))
+                  }
+                >
                   <SelectTrigger className="text-xs sm:text-sm h-10 flex-1 rounded-full bg-blue-100 text-black font-medium">
                     <SelectValue />
                   </SelectTrigger>
@@ -116,7 +170,12 @@ const AddPage = () => {
                     })}
                   </SelectContent>
                 </Select>
-                <Select value={category} onValueChange={setCategory}>
+                <Select
+                  value={txnData.category}
+                  onValueChange={(value) =>
+                    setTxnData((prev) => ({ ...prev, category: value }))
+                  }
+                >
                   <SelectTrigger className="text-xs sm:text-sm h-10 flex-1 rounded-full bg-green-100 text-black font-medium">
                     <div className="flex items-center gap-2">
                       <SelectValue />
@@ -141,9 +200,11 @@ const AddPage = () => {
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setType("expense")}
+                  onClick={() =>
+                    setTxnData((prev) => ({ ...prev, type: "expense" }))
+                  }
                   className={`cursor-pointer flex-1 rounded-full py-2 text-black text-xs sm:text-sm font-medium transition-colors ${
-                    type === "expense"
+                    txnData.type === "expense"
                       ? "bg-orange-300"
                       : "bg-muted hover:bg-orange-100/80"
                   }`}
@@ -152,9 +213,11 @@ const AddPage = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setType("income")}
+                  onClick={() =>
+                    setTxnData((prev) => ({ ...prev, type: "income" }))
+                  }
                   className={`cursor-pointer flex-1 rounded-full py-2 text-black text-xs sm:text-sm  font-medium transition-colors ${
-                    type === "income"
+                    txnData.type === "income"
                       ? "bg-orange-300"
                       : "bg-muted hover:bg-orange-100/80"
                   }`}
@@ -169,11 +232,19 @@ const AddPage = () => {
               <div className="text-center text-4xl sm:text-5xl md:text-6xl font-semibold tabular-nums tracking-tight">
                 <p className="flex justify-center items-center">
                   <MdOutlineCurrencyRupee className="size-5 sm:size-6 md:size-7 text-[#535353]" />
-                  <span>{amount}</span>
+                  <span>{txnData.amount}</span>
                 </p>
               </div>
               <div className="text-center mt-2">
                 <input
+                  value={txnData.comment}
+                  onChange={(e) =>
+                    setTxnData((prev) => ({
+                      ...prev,
+                      comment: e.target.value,
+                    }))
+                  }
+                  maxLength={30}
                   type="text"
                   className="w-full text-sm sm:text-base font-medium text-[#434343] placeholder:text-center text-center focus:outline-none"
                   placeholder="Add comment..."
@@ -220,14 +291,22 @@ const AddPage = () => {
                 >
                   <Delete className="mx-auto size-4 sm:size-5 md:size-6" />
                 </button>
-                <button
-                  type="button"
-                  onClick={handleDelete}
-                  className="active:scale-95 bg-gray-100 rounded-2xl p-3 md:p-4 col-span-2"
-                >
-                  <Calendar className="mx-auto size-4 sm:size-5 md:size-6" />
-                </button>
-                {/* Submit button - spans half width (default in a grid-cols-2 setup) */}
+                <DateInputLabel
+                  id="txn-date"
+                  label="Date"
+                  onChange={handleDateChange}
+                  placeholder="Select date"
+                  min={
+                    new Date(
+                      new Date().getFullYear(),
+                      new Date().getMonth() - 1,
+                      1
+                    )
+                      .toISOString()
+                      .split("T")[0]
+                  }
+                  max={new Date().toISOString().split("T")[0]}
+                />
                 <button
                   type="button"
                   onClick={handleSubmit}
