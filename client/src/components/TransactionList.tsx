@@ -1,82 +1,100 @@
-import {
-  ShoppingBag,
-  Gift,
-  Utensils,
-  Home,
-  Car,
-  Smartphone,
-} from "lucide-react";
+"use client";
+
+import { callApi } from "@/utils/callApi";
+import { categoryIcon } from "@/utils/categories";
+import { useQuery } from "@tanstack/react-query";
+import { Calendar } from "lucide-react";
+import { MdOutlineCurrencyRupee } from "react-icons/md";
 
 export interface Transaction {
-  id: string;
+  id: number;
+  txn_mode: string;
   category: string;
-  icon: string;
-  paymentMethod: string;
+  txn_type: string;
   amount: number;
-  percentage: number;
+  txn_date: string;
+  comment?: string;
 }
-
-interface TransactionsListProps {
-  transactions: Transaction[];
-}
-
-const iconMap: Record<string, typeof ShoppingBag> = {
-  shopping: ShoppingBag,
-  gifts: Gift,
-  food: Utensils,
-  home: Home,
-  transport: Car,
-  tech: Smartphone,
-};
 
 const iconColorMap: Record<string, string> = {
-  shopping: "bg-orange-200 text-black",
-  food: "bg-yellow-200 text-black",
-  home: "bg-blue-200 text-black",
-  transport: "bg-green-200 text-black",
-  health: "bg-red-200 text-black",
-  gifts: "bg-pink-200 text-black",
-  savings: "bg-purple-200 text-black",
-  salary: "bg-teal-200 text-black",
-  other: "bg-gray-200 text-black",
+  Shopping: "bg-orange-200 text-black",
+  Food: "bg-yellow-200 text-black",
+  Home: "bg-blue-200 text-black",
+  Transport: "bg-green-200 text-black",
+  Health: "bg-red-200 text-black",
+  Gifts: "bg-pink-200 text-black",
+  Savings: "bg-purple-200 text-black",
+  Salary: "bg-teal-200 text-black",
+  Other: "bg-gray-200 text-black",
 };
 
-const TransactionsList = ({ transactions }: TransactionsListProps) => {
+const useRecentTransactions = () => {
+  return useQuery({
+    queryKey: ["recentTransactions"],
+    queryFn: async () => {
+      const res = await callApi.get("/transaction/recent");
+      return res.data as Transaction[];
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+};
+
+const TransactionsList = () => {
+  const { data: transactions = [] } = useRecentTransactions();
+
   return (
     <div className="py-4 md:px-4 space-y-3 container mx-auto mb-16 md:mb-20">
-      {transactions.map((transaction) => {
-        const Icon = iconMap[transaction.icon] || ShoppingBag;
+      {transactions?.map((transaction) => {
+        const Icon = categoryIcon(transaction.category);
         const iconColor =
-          iconColorMap[transaction.icon] || "bg-muted text-foreground";
-        const isPositive = transaction.amount > 0;
+          iconColorMap[transaction.category] || "bg-muted text-foreground";
+
+        const txnType = transaction.txn_type;
 
         return (
-          <div key={transaction.id} className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+          <div key={transaction.id} className="px-4 py-2">
+            <div className="flex items-start justify-between">
+              <div className="flex items-start gap-3">
                 <div className={`p-3 rounded-full ${iconColor}`}>
                   <Icon className="size-4 md:size-5" />
                 </div>
-                <div>
+                <div className="space-y-1">
                   <p className="font-semibold text-sm sm:text-base text-[#333333]">
                     {transaction.category}
                   </p>
-                  <p className="text-xs sm:text-sm text-[#666666]">
-                    {transaction.paymentMethod}
+
+                  {transaction.comment && (
+                    <p className="text-xs sm:text-sm text-[#666666] overflow-hidden text-ellipsis max-w-xs">
+                      {transaction.comment}
+                    </p>
+                  )}
+                  <p className="flex items-center gap-1 text-xs sm:text-sm text-[#666]">
+                    <span>
+                      <Calendar className="size-2.5 sm:size-3" />
+                    </span>
+                    {new Date(transaction.txn_date).toLocaleDateString(
+                      "en-IN",
+                      {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      }
+                    )}
                   </p>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="text-right flex flex-col items-end">
                 <p
-                  className={`font-bold ${
-                    isPositive ? "text-chart-2" : "text-foreground"
+                  className={`font-bold flex items-center text-xs sm:text-sm md:text-base ${
+                    txnType === "income" ? "text-green-600" : "text-red-600"
                   }`}
                 >
-                  {isPositive ? "+" : "-"}$
+                  {txnType === "income" ? "+" : "-"}
+                  <MdOutlineCurrencyRupee className="inline size-3 sm:size-4" />
                   {Math.abs(transaction.amount).toFixed(2)}
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  {transaction.percentage}%
+                <p className="text-xs sm:text-sm text-[#666666]">
+                  {transaction.txn_mode}
                 </p>
               </div>
             </div>
