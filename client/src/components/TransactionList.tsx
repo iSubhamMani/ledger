@@ -86,7 +86,7 @@ const TransactionsList = () => {
               <div className="text-right flex flex-col items-end">
                 <p
                   className={`font-bold flex items-center text-xs sm:text-sm md:text-base ${
-                    txnType === "income" ? "text-green-600" : "text-red-600"
+                    txnType === "income" ? "text-green-600" : "text-red-500"
                   }`}
                 >
                   {txnType === "income" ? "+" : "-"}
