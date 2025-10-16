@@ -1,11 +1,11 @@
-from flask import Flask, redirect, request, jsonify, make_response
+from flask import Flask
 import os
-import jwt
 from dotenv import load_dotenv
 from flask_cors import CORS
 from providers.google import callback as googleCallback, redirectToGoogleLogin
 from shared_db import init_db
-from shared_db.models import User
+from controllers.logout import logout as logoutUser
+from controllers.me import me as getMe
 
 load_dotenv()
 app = Flask(__name__)
@@ -31,27 +31,11 @@ def google_callback():
 
 @app.route("/logout")
 def logout():
-    resp = make_response(redirect(f"{FRONTEND_URL}/"))
-    resp.set_cookie("auth_token", "", expires=0)
-    return resp
+    return logoutUser()
 
 @app.route("/me")
 def me():
-    token = request.cookies.get("auth_token")
-    if not token:
-        return jsonify({"error": "Unauthorized"}), 401
-    try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
-        return jsonify({
-            "id": payload["id"],
-            "name": payload["name"],
-            "photo": payload["photo"],
-        })
-    except jwt.ExpiredSignatureError:
-        return jsonify({"error": "Token expired"}), 401
-    except jwt.InvalidTokenError:
-        return jsonify({"error": "Invalid token"}), 401
-
+    return getMe()
 
 if __name__ == "__main__":
     app.run(port=8000, debug=True)
