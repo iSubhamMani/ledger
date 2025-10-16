@@ -1,24 +1,16 @@
 from flask import request, jsonify
-import jwt
-import os
 from dotenv import load_dotenv
 from shared_db import db
 from shared_db.models import Transaction
+from utils.validate_user import validate_user
+from datetime import datetime
 
 load_dotenv()
 
 def add_txn():
-    token = request.cookies.get("auth_token");
-
-    if not token:
-        return jsonify({"error": "Unauthorized"}), 401
-    
-    try:
-        decoded = jwt.decode(token, os.getenv("JWT_SECRET"), algorithms=["HS256"])
-    except jwt.ExpiredSignatureError:
-        return jsonify({"error": "Token expired"}), 401
-    except Exception:
-        return jsonify({"error": "Invalid token"}), 401
+    decoded, error_response, status_code = validate_user()
+    if error_response:
+        return error_response, status_code
     
     userId = decoded["id"]
     data = request.get_json()
@@ -31,7 +23,10 @@ def add_txn():
         txn_mode=data["txn_mode"],
         category=data["category"],
         txn_type=data["txn_type"],
-        amount=float(data["amount"])
+        amount=float(data["amount"]),
+        txn_date=data["txn_date"],
+        comment=data["comment"].strip() if data["comment"] else None,
+        created_at= datetime.now()
     )
 
     db.session.add(txn_data)
