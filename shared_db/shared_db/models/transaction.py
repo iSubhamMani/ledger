@@ -18,3 +18,6 @@ class Transaction(db.Model):
         name='transaction_category'), nullable=False)
     txn_type = db.Column(db.Enum('expense', 'income', name='transaction_type'), nullable=False)
     amount = db.Column(db.Float, nullable=False)
+    txn_date = db.Column(db.DateTime, nullable=False)
+    comment = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
